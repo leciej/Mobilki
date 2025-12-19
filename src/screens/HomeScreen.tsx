@@ -1,52 +1,48 @@
 import React from 'react';
-import { SafeAreaView, Text, StyleSheet } from 'react-native';
-import { TextInput } from 'react-native';
+import {
+  SafeAreaView,
+  Text,
+  StyleSheet,
+  Button,
+  View,
+} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { PrimaryButton } from '../components/PrimaryButton';
-import { Card } from '../components/Card';
-import { getTasks, type Task } from '../features/tasks/queries';
-import { addTask } from '../features/tasks/commands';
-import { TaskItem } from '../components/TaskItem';
-import { toggleTask } from '../features/tasks/commands';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+type Props = NativeStackScreenProps<
+  RootStackParamList,
+  'Home'
+>;
 
-export function HomeScreen() {
-  const [tasks, setTasks] = React.useState<Task[]>(getTasks());
-  const [title, setTitle] = React.useState('');
-
-  const handleAddTask = () => {
-    addTask(title);
-    setTasks(getTasks());
-    setTitle('');
-  };
-  const handleToggleTask = (id: string) => {
-    toggleTask(id);
-    setTasks(getTasks());
-  };
-
+export function HomeScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.container}>
-      <Text>TEST – HOME DZIAŁA</Text>
+      <Text style={styles.title}>Sklep z akwarelami 🎨</Text>
+      <Text style={styles.subtitle}>
+        Wybierz, gdzie chcesz przejść
+      </Text>
 
-      {tasks.map(task => (
-        <TaskItem key={task.id} task={task} onPress={handleToggleTask} />
-      ))}
+      <View style={styles.buttons}>
+        <Button
+          title="Produkty"
+          onPress={() => navigation.navigate('Products')}
+        />
 
-      <TextInput
-        value={title}
-        onChangeText={setTitle}
-        placeholder="Wpisz treść taska"
-        style={{
-          borderWidth: 1,
-          borderColor: '#ccc',
-          padding: 8,
-          marginVertical: 8,
-        }}
-      />
+        <Button
+          title="Galeria"
+          onPress={() => navigation.navigate('Gallery')}
+        />
 
-      <PrimaryButton title="Dodaj task" onPress={handleAddTask} />
+        <Button
+          title="Koszyk"
+          onPress={() => navigation.navigate('Cart')}
+        />
+
+        <Button
+          title="Profil"
+          onPress={() => navigation.navigate('Profile')}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -54,12 +50,22 @@ export function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
+    fontWeight: '700',
     marginBottom: 8,
-    fontWeight: '600',
+  },
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 24,
+    color: '#666',
+  },
+  buttons: {
+    width: '100%',
+    gap: 12,
   },
 });

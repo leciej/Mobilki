@@ -1,8 +1,16 @@
 import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import { AppNavigator } from './src/navigation/AppNavigator';
+import { AuthProvider } from './src/auth/AuthContext';
 
 function App() {
-  return <AppNavigator />;
+  return (
+    <AuthProvider>
+      <NavigationContainer>
+        <AppNavigator />
+      </NavigationContainer>
+    </AuthProvider>
+  );
 }
 
 export default App;
