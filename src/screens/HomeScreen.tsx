@@ -1,19 +1,26 @@
 import React from 'react';
-import { SafeAreaView, Text, StyleSheet, Button } from 'react-native';
+import { SafeAreaView, Text, StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { PrimaryButton } from '../components/PrimaryButton';
+import { Card } from '../components/Card';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export function HomeScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Mobilki 🚀</Text>
-      <Text>Pierwszy własny ekran działa</Text>
-      <Button
-        title="Przejdź do szczegółów"
-        onPress={() => navigation.navigate('Details')}
-      />
+      <Card>
+  <Text style={styles.title}>Mobilki 🚀</Text>
+  <Text>Pierwszy własny ekran działa</Text>
+
+  <PrimaryButton
+    title="Przejdź do szczegółów"
+    onPress={() => navigation.navigate('Details')}
+  />
+</Card>
+
+
     </SafeAreaView>
   );
 }
