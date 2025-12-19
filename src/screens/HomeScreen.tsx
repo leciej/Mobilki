@@ -7,6 +7,8 @@ import { PrimaryButton } from '../components/PrimaryButton';
 import { Card } from '../components/Card';
 import { getTasks, type Task } from '../features/tasks/queries';
 import { addTask } from '../features/tasks/commands';
+import { TaskItem } from '../components/TaskItem';
+import { toggleTask } from '../features/tasks/commands';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -19,34 +21,35 @@ export function HomeScreen() {
     setTasks(getTasks());
     setTitle('');
   };
+  const handleToggleTask = (id: string) => {
+    toggleTask(id);
+    setTasks(getTasks());
+  };
 
   return (
-  <SafeAreaView style={styles.container}>
-    <Text>TEST – HOME DZIAŁA</Text>
+    <SafeAreaView style={styles.container}>
+      <Text>TEST – HOME DZIAŁA</Text>
 
-    {tasks.map(task => (
-      <Text key={task.id}>
-        {task.completed ? '✅' : '⬜'} {task.title}
-      </Text>
-    ))}
+      {tasks.map(task => (
+        <TaskItem key={task.id} task={task} onPress={handleToggleTask} />
+      ))}
 
-    <TextInput
-      value={title}
-      onChangeText={setTitle}
-      placeholder="Wpisz treść taska"
-      style={{
-        borderWidth: 1,
-        borderColor: '#ccc',
-        padding: 8,
-        marginVertical: 8,
-      }}
-    />
+      <TextInput
+        value={title}
+        onChangeText={setTitle}
+        placeholder="Wpisz treść taska"
+        style={{
+          borderWidth: 1,
+          borderColor: '#ccc',
+          padding: 8,
+          marginVertical: 8,
+        }}
+      />
 
-    <PrimaryButton title="Dodaj task" onPress={handleAddTask} />
-  </SafeAreaView>
-);
+      <PrimaryButton title="Dodaj task" onPress={handleAddTask} />
+    </SafeAreaView>
+  );
 }
-
 
 const styles = StyleSheet.create({
   container: {

@@ -18,3 +18,11 @@ export function addTask(title: string): void {
 export function getTasksSnapshot(): Task[] {
   return tasks;
 }
+
+export function toggleTask(id: string): void {
+  tasks = tasks.map(task =>
+    task.id === id
+      ? { ...task, completed: !task.completed }
+      : task
+  );
+}
