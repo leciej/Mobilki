@@ -5,30 +5,31 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Card } from '../components/Card';
 import { getTasks, type Task } from '../features/tasks/queries';
+import { addTask } from '../features/tasks/commands';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
-export function HomeScreen({ navigation }: Props) {
-  const tasks: Task[] = getTasks();
-  return (
-    <SafeAreaView style={styles.container}>
-      <Card>
-        <Text style={styles.title}>Mobilki 🚀</Text>
-        <Text>Pierwszy własny ekran działa</Text>
-        {tasks.map(task => (
-          <Text key={task.id}>
-            {task.completed ? '✅' : '⬜'} {task.title}
-          </Text>
-        ))}
+export function HomeScreen() {
+  const [tasks, setTasks] = React.useState<Task[]>(getTasks());
 
-        <PrimaryButton
-          title="Przejdź do szczegółów"
-          onPress={() => navigation.navigate('Details')}
-        />
-      </Card>
+  const handleAddTask = () => {
+    addTask('Nowy task');
+    setTasks(getTasks());
+  };
+
+  return (
+    <SafeAreaView>
+      {tasks.map(task => (
+        <Text key={task.id}>
+          {task.completed ? '✅' : '⬜'} {task.title}
+        </Text>
+      ))}
+
+      <PrimaryButton title="Dodaj task" onPress={handleAddTask} />
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
