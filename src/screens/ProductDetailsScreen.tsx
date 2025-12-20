@@ -3,6 +3,8 @@ import { View, Text, StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { mockProducts } from '../features/products/mockProducts';
+import { Button } from 'react-native';
+import { addToCart } from '../features/cart/commands/addToCart';
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
@@ -28,6 +30,10 @@ export function ProductDetailsScreen({ route }: Props) {
       <Text style={styles.desc}>
         Piękna akwarela, ręcznie malowana 🎨
       </Text>
+      <Button
+        title="Dodaj do koszyka"
+        onPress={() => addToCart(product)}
+      />
     </View>
   );
 }
