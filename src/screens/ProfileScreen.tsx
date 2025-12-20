@@ -8,10 +8,7 @@ export function ProfileScreen() {
   return (
     <View>
       <Text>Profil</Text>
-      <Button
-        title="Wyloguj"
-        onPress={logout}
-      />
+      <Button title="Wyloguj" onPress={logout} />
     </View>
   );
 }

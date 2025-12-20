@@ -29,38 +29,21 @@ export function AppNavigator() {
     <Stack.Navigator>
       {isLoggedIn ? (
         <>
-          <Stack.Screen
-            name="Home"
-            component={HomeScreen}
-          />
-          <Stack.Screen
-            name="Products"
-            component={ProductsScreen}
-          />
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Products" component={ProductsScreen} />
           <Stack.Screen
             name="ProductDetails"
             component={ProductDetailsScreen}
+            options={{ title: 'Szczegóły produktu' }}
           />
-          <Stack.Screen
-            name="Gallery"
-            component={GalleryScreen}
-          />
-          <Stack.Screen
-            name="Cart"
-            component={CartScreen}
-          />
-          <Stack.Screen
-            name="Profile"
-            component={ProfileScreen}
-          />
+
+          <Stack.Screen name="Gallery" component={GalleryScreen} />
+          <Stack.Screen name="Cart" component={CartScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
         </>
       ) : (
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-        />
+        <Stack.Screen name="Login" component={LoginScreen} />
       )}
     </Stack.Navigator>
   );
 }
-
