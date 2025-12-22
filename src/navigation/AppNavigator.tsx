@@ -1,17 +1,15 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import { LoginScreen } from '../screens/LoginScreen';
-import { HomeScreen } from '../screens/HomeScreen';
-import { ProductsScreen } from '../screens/ProductsScreen';
-import { ProductDetailsScreen } from '../screens/ProductDetailsScreen';
-import { GalleryScreen } from '../screens/GalleryScreen';
-import { CartScreen } from '../screens/CartScreen';
-import { ProfileScreen } from '../screens/ProfileScreen';
 import { useAuth } from '../auth/AuthContext';
+import { TabsNavigator } from './TabsNavigator/TabsNavigator';
+import { AdminNavigator } from './AdminNavigator';
 
 export type RootStackParamList = {
   Login: undefined;
+  Main: undefined;
+  Admin: undefined;
   Home: undefined;
   Products: undefined;
   ProductDetails: { productId: string };
@@ -23,26 +21,28 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function AppNavigator() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, role } = useAuth();
 
   return (
     <Stack.Navigator>
-      {isLoggedIn ? (
-        <>
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="Products" component={ProductsScreen} />
-          <Stack.Screen
-            name="ProductDetails"
-            component={ProductDetailsScreen}
-            options={{ title: 'Szczegóły produktu' }}
-          />
-
-          <Stack.Screen name="Gallery" component={GalleryScreen} />
-          <Stack.Screen name="Cart" component={CartScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-        </>
+      {!isLoggedIn ? (
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{ headerShown: false }}
+        />
+      ) : role === 'ADMIN' ? (
+        <Stack.Screen
+          name="Admin"
+          component={AdminNavigator}
+          options={{ headerShown: false }}
+        />
       ) : (
-        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen
+          name="Main"
+          component={TabsNavigator}
+          options={{ headerShown: false }}
+        />
       )}
     </Stack.Navigator>
   );

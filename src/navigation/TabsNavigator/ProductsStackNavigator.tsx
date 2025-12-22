@@ -1,22 +1,12 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useFocusEffect } from '@react-navigation/native';
+
 import { ProductsStackNavigator } from './ProductsStackNavigator';
 import { ProfileScreen } from '../../screens/ProfileScreen';
-import { CartScreen } from '../../screens/CartScreen';
-import { getCartItemsCount } from '../../features/cart/store/cartStore';
 
 const Tab = createBottomTabNavigator();
 
 export function TabsNavigator() {
-  const [cartCount, setCartCount] = useState(0);
-
-  useFocusEffect(
-    useCallback(() => {
-      setCartCount(getCartItemsCount());
-    }, [])
-  );
-
   return (
     <Tab.Navigator>
       <Tab.Screen
@@ -25,16 +15,6 @@ export function TabsNavigator() {
         options={{
           title: 'Produkty',
           headerShown: false,
-        }}
-      />
-
-      <Tab.Screen
-        name="Cart"
-        component={CartScreen}
-        options={{
-          title: 'Koszyk',
-          tabBarBadge:
-            cartCount > 0 ? cartCount : undefined,
         }}
       />
 
