@@ -6,62 +6,62 @@ import {
   Pressable,
   StyleSheet,
   Image,
+  ToastAndroid,
+  ListRenderItem,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { mockProducts, Product } from '../features/products/mockProducts';
-import { addToCart } from '../features/cart/commands/addToCart';
+import { addItemToCart } from '../features/cart/store/cartStore';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Products'>;
 
-export function ProductsScreen({ navigation }: Props) {
+export function ProductsScreen({ navigation }: Props): JSX.Element {
+  const handleAddToCart = (product: Product): void => {
+    addItemToCart(product);
+    ToastAndroid.show(
+      `Dodano "${product.name}" do koszyka`,
+      ToastAndroid.SHORT,
+    );
+  };
+
+  const renderItem: ListRenderItem<Product> = ({ item }) => (
+    <View style={styles.card}>
+      <Pressable
+        onPress={() =>
+          navigation.navigate('ProductDetails', {
+            productId: item.id,
+          })
+        }
+      >
+        <View style={styles.topRow}>
+          {item.image && (
+            <Image source={{ uri: item.image }} style={styles.thumbnail} />
+          )}
+          <View style={styles.info}>
+            <Text style={styles.name}>{item.name}</Text>
+            <Text style={styles.artist}>{item.artist}</Text>
+            <Text style={styles.price}>{item.price} zł</Text>
+          </View>
+        </View>
+      </Pressable>
+
+      <Pressable
+        style={styles.cartButton}
+        onPress={() => handleAddToCart(item)}
+      >
+        <Text style={styles.cartText}>Dodaj do koszyka</Text>
+      </Pressable>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Produkty</Text>
-
-      <FlatList
+      <FlatList<Product>
         data={mockProducts}
-        keyExtractor={(item: Product) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Pressable
-              onPress={() =>
-                navigation.navigate('ProductDetails', {
-                  productId: item.id,
-                })
-              }
-            >
-              <View style={styles.topRow}>
-                {item.image && (
-                  <Image
-                    source={{ uri: item.image }}
-                    style={styles.thumbnail}
-                  />
-                )}
-
-                <View style={styles.info}>
-                  <Text style={styles.name}>{item.name}</Text>
-                  <Text style={styles.artist}>{item.artist}</Text>
-                  <Text style={styles.price}>{item.price} zł</Text>
-                </View>
-              </View>
-            </Pressable>
-
-            <Pressable
-              style={styles.cartButton}
-              onPress={() => {
-                addToCart(item);
-                Alert.alert(
-                  'Dodano do koszyka',
-                  `${item.name} został dodany do koszyka`,
-                );
-              }}
-            >
-              <Text style={styles.cartText}>Dodaj do koszyka</Text>
-            </Pressable>
-          </View>
-        )}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
       />
     </View>
   );

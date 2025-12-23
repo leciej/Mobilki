@@ -2,89 +2,146 @@ import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
-  FlatList,
   StyleSheet,
   Pressable,
+  FlatList,
+  Image,
+  Alert,
+  ListRenderItem,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-
 import {
-  CartItem,
   getCartSnapshot,
-  getCartTotal,
-  removeFromCartStore,
-  clearCartStore,
+  decreaseItemInCart,
+  addItemToCart,
+  removeItemFromCart,
+  clearCart,
 } from '../features/cart/store/cartStore';
+import type { CartItem } from '../features/cart/store/cartStore';
 
 export function CartScreen() {
   const [items, setItems] = useState<CartItem[]>([]);
-  const [total, setTotal] = useState(0);
+  const [blinkPlusId, setBlinkPlusId] = useState<string | null>(null);
+  const [blinkMinusId, setBlinkMinusId] = useState<string | null>(null);
 
-  const refresh = useCallback(() => {
-    setItems(getCartSnapshot());
-    setTotal(getCartTotal());
-  }, []);
+  const refresh = (): void => {
+    setItems([...getCartSnapshot()]);
+  };
 
   useFocusEffect(
-    useCallback(() => {
+    useCallback((): void => {
       refresh();
-    }, [refresh])
+    }, [])
+  );
+
+  const total: number = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
+  const order = (): void => {
+    Alert.alert(
+      'Zamówienie złożone',
+      'Koszyk został wyczyszczony (demo)',
+      [{ text: 'OK' }]
+    );
+    clearCart();
+    refresh();
+  };
+
+  const renderItem: ListRenderItem<CartItem> = ({ item }) => (
+    <View style={styles.item}>
+      <View style={styles.row}>
+        {item.image && (
+          <Image source={{ uri: item.image }} style={styles.thumbnail} />
+        )}
+
+        <View style={styles.info}>
+          <Text style={styles.name}>{item.name}</Text>
+
+          <View style={styles.controls}>
+            <Pressable
+              style={[
+                styles.controlButton,
+                item.quantity === 1 && styles.disabled,
+              ]}
+              disabled={item.quantity === 1}
+              onPress={() => {
+                decreaseItemInCart(item.id);
+                setBlinkMinusId(item.id);
+                refresh();
+                setTimeout(() => setBlinkMinusId(null), 150);
+              }}
+            >
+              <Text style={styles.controlText}>−</Text>
+            </Pressable>
+
+            <Text
+              style={[
+                styles.quantity,
+                blinkPlusId === item.id && styles.blinkPlus,
+                blinkMinusId === item.id && styles.blinkMinus,
+              ]}
+            >
+              {item.quantity}
+            </Text>
+
+            <Pressable
+              style={styles.controlButton}
+              onPress={() => {
+                addItemToCart(item);
+                setBlinkPlusId(item.id);
+                refresh();
+                setTimeout(() => setBlinkPlusId(null), 150);
+              }}
+            >
+              <Text style={styles.controlText}>+</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.remove}
+              onPress={() => {
+                removeItemFromCart(item.id);
+                refresh();
+              }}
+            >
+              <Text style={styles.removeText}>🗑</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </View>
   );
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Koszyk</Text>
 
-      {items.length === 0 ? (
-        <Text>Koszyk jest pusty</Text>
-      ) : (
-        <>
-          <FlatList
-            data={items}
-            keyExtractor={item => item.product.id}
-            renderItem={({ item }) => (
-              <View style={styles.row}>
-                <View style={styles.info}>
-                  <Text style={styles.name}>
-                    {item.product.name}
-                  </Text>
-                  <Text style={styles.meta}>
-                    {item.quantity} × {item.product.price} zł
-                  </Text>
-                </View>
+      <FlatList<CartItem>
+        data={items}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+      />
 
-                <Pressable
-                  style={styles.removeBtn}
-                  onPress={() => {
-                    removeFromCartStore(item.product.id);
-                    refresh();
-                  }}
-                >
-                  <Text style={styles.removeText}>
-                    Usuń
-                  </Text>
-                </Pressable>
-              </View>
-            )}
-          />
+      <Text style={styles.total}>Suma: {total} zł</Text>
 
-          <Text style={styles.total}>
-            Suma: {total} zł
-          </Text>
+      <Pressable
+        style={[styles.order, items.length === 0 && styles.disabled]}
+        disabled={items.length === 0}
+        onPress={order}
+      >
+        <Text style={styles.orderText}>Zamów</Text>
+      </Pressable>
 
-          <Pressable
-            style={styles.clearBtn}
-            onPress={() => {
-              clearCartStore();
-              refresh();
-            }}
-          >
-            <Text style={styles.clearText}>
-              Wyczyść koszyk
-            </Text>
-          </Pressable>
-        </>
-      )}
+      <Pressable
+        style={styles.clear}
+        onPress={() => {
+          clearCart();
+          refresh();
+        }}
+      >
+        <Text style={styles.clearText}>Wyczyść koszyk</Text>
+      </Pressable>
     </View>
   );
 }
@@ -95,17 +152,21 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700',
-    marginBottom: 12,
+    marginBottom: 16,
+  },
+  item: {
+    marginBottom: 16,
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#f2f2f2',
-    borderRadius: 8,
-    marginBottom: 10,
+  },
+  thumbnail: {
+    width: 64,
+    height: 64,
+    borderRadius: 6,
+    marginRight: 12,
   },
   info: {
     flex: 1,
@@ -113,35 +174,70 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: '600',
+    marginBottom: 8,
   },
-  meta: {
-    color: '#666',
-    marginTop: 2,
+  controls: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  removeBtn: {
-    backgroundColor: '#d32f2f',
-    paddingVertical: 8,
+  controlButton: {
+    backgroundColor: '#e0e0e0',
     paddingHorizontal: 12,
-    borderRadius: 6,
+    paddingVertical: 6,
+    borderRadius: 4,
   },
-  removeText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  total: {
-    marginTop: 8,
-    fontSize: 16,
+  controlText: {
+    fontSize: 18,
     fontWeight: '700',
   },
-  clearBtn: {
+  quantity: {
+    marginHorizontal: 12,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  blinkPlus: {
+    color: '#2e7d32',
+    fontSize: 18,
+  },
+  blinkMinus: {
+    color: '#b71c1c',
+    fontSize: 18,
+  },
+  remove: {
+    marginLeft: 16,
+  },
+  removeText: {
+    fontSize: 18,
+  },
+  total: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginTop: 24,
+  },
+  order: {
+    marginTop: 12,
+    backgroundColor: '#2e7d32',
+    padding: 14,
+    borderRadius: 6,
+  },
+  orderText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  clear: {
     marginTop: 10,
-    backgroundColor: '#455a64',
-    padding: 12,
+    backgroundColor: '#b71c1c',
+    padding: 14,
     borderRadius: 6,
   },
   clearText: {
     color: '#fff',
     textAlign: 'center',
-    fontWeight: '600',
+    fontWeight: '700',
+  },
+  disabled: {
+    opacity: 0.5,
   },
 });

@@ -1,4 +1,4 @@
-import type { Product } from '../products/mockProducts';
+import type { Product } from '../../products/mockProducts';
 
 export type CartItem = Product & {
   quantity: number;

@@ -1,43 +1,37 @@
-import React, { useCallback, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useFocusEffect } from '@react-navigation/native';
-import { ProductsStackNavigator } from './ProductsStackNavigator';
+import { ProductsScreen } from '../../screens/ProductsScreen';
 import { ProfileScreen } from '../../screens/ProfileScreen';
-import { CartScreen } from '../../screens/CartScreen';
 import { getCartItemsCount } from '../../features/cart/store/cartStore';
 
-const Tab = createBottomTabNavigator();
+export type TabsParamList = {
+  Products: undefined;
+  Profile: undefined;
+};
 
-export function TabsNavigator() {
-  const [cartCount, setCartCount] = useState(0);
+const Tab = createBottomTabNavigator<TabsParamList>();
 
-  useFocusEffect(
-    useCallback(() => {
+export function TabsNavigator(): JSX.Element {
+  const [cartCount, setCartCount] = useState<number>(0);
+
+  useEffect((): (() => void) => {
+    const interval = setInterval(() => {
       setCartCount(getCartItemsCount());
-    }, [])
-  );
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <Tab.Navigator>
       <Tab.Screen
-        name="ProductsTab"
-        component={ProductsStackNavigator}
+        name="Products"
+        component={ProductsScreen}
         options={{
           title: 'Produkty',
-          headerShown: false,
+          tabBarBadge: cartCount > 0 ? cartCount : undefined,
         }}
       />
-
-      <Tab.Screen
-        name="Cart"
-        component={CartScreen}
-        options={{
-          title: 'Koszyk',
-          tabBarBadge:
-            cartCount > 0 ? cartCount : undefined,
-        }}
-      />
-
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
