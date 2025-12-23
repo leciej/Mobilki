@@ -1,28 +1,30 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { ProductsStackNavigator } from './ProductsStackNavigator';
-import { ProfileScreen } from '../../screens/ProfileScreen';
+import { ProductsScreen } from '../../screens/ProductsScreen';
+import { ProductDetailsScreen } from '../../screens/ProductDetailsScreen';
 
-const Tab = createBottomTabNavigator();
+export type ProductsStackParamList = {
+  Products: undefined;
+  ProductDetails: { productId: string };
+};
 
-export function TabsNavigator() {
+const Stack = createNativeStackNavigator<ProductsStackParamList>();
+
+export function ProductsStackNavigator() {
   return (
-    <Tab.Navigator>
-      <Tab.Screen
-        name="ProductsTab"
-        component={ProductsStackNavigator}
-        options={{
-          title: 'Produkty',
-          headerShown: false,
-        }}
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Products"
+        component={ProductsScreen}
+        options={{ title: 'Produkty' }}
       />
 
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{ title: 'Profil' }}
+      <Stack.Screen
+        name="ProductDetails"
+        component={ProductDetailsScreen}
+        options={{ title: 'Szczegóły produktu' }}
       />
-    </Tab.Navigator>
+    </Stack.Navigator>
   );
 }

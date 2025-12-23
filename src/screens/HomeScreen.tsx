@@ -6,18 +6,17 @@ import {
   Button,
   View,
 } from 'react-native';
+
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 
-type Props = NativeStackScreenProps<
-  RootStackParamList,
-  'Home'
->;
+type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export function HomeScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Sklep z akwarelami 🎨</Text>
+      <Text style={styles.title}>Sklep z akwarelami</Text>
+
       <Text style={styles.subtitle}>
         Wybierz, gdzie chcesz przejść
       </Text>
